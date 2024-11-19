@@ -28,6 +28,8 @@ class REST:
 
     """
 
+    timeout = 60.0
+
     # All Impala specific functions are implemented in opensky_impala.py
 
     _json_columns = (
@@ -58,7 +60,7 @@ class REST:
         self.client = httpx.Client()
 
     def get(self, query: str, retry: int = 5) -> Any:
-        c = self.client.get(query, auth=self.auth)
+        c = self.client.get(query, auth=self.auth, timeout=self.timeout)
         try:
             if limit := c.headers.get("X-Rate-Limit-Remaining", None):
                 limit = int(limit)
@@ -95,7 +97,7 @@ class REST:
     async def async_get(
         self, client: httpx.AsyncClient, query: str, retry: int = 5
     ) -> pd.DataFrame:
-        c = await client.get(query, auth=self.auth)
+        c = await client.get(query, auth=self.auth, timeout=self.timeout)
         try:
             if limit := c.headers.get("X-Rate-Limit-Remaining", None):
                 limit = int(limit)
